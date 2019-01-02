@@ -1,4 +1,4 @@
-class Matrix_(object):
+class Matrix(object):
     def __init__(self, matrixList):
         self.matrix = matrixList
         self.rows = len(self.matrix)
@@ -19,7 +19,7 @@ class Matrix_(object):
                 for col in range(self.cols):
                     rowsum.append(self.matrix[row][col]+other.matrix[row][col])
                 sumMatrix.append(rowsum)
-            return Matrix_(sumMatrix)
+            return Matrix(sumMatrix)
     def __rmul__(self, other):
         if (not(hasattr(other, "__iter__"))): # scalar product
             productMatrix = []; scalar = other
@@ -28,7 +28,7 @@ class Matrix_(object):
                 for col in range(self.cols):
                     colproducts.append(scalar * self.matrix[row][col])
                 productMatrix.append(colproducts)
-            return Matrix_(productMatrix)
+            return Matrix(productMatrix)
     def __mul__(self, other):
         return other * self
     def toString(self):
@@ -74,14 +74,15 @@ def errorMatrix(matrix1):
                 rowlist.append("*")
             undefOutList.append(rowlist)
         return undefOutList
+# -- Rudementary Tests -- #
 
-#inString = input("Input matrix with commas separating elements and semicolons terminating lines")
+# Input matrix with commas separating elements and semicolons terminating lines
 inString = "1,0;0,1"
 matrix = stringToList(inString)
-identityMatrix2 = Matrix_(matrix)
+identityMatrix2 = Matrix(matrix)
 
-matrixA = Matrix_(stringToList("1,0,0;0,1,0;0,0,1"))
-matrixB = Matrix_([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+matrixA = Matrix(stringToList("1,0,0;0,1,0;0,0,1"))
+matrixB = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 printMatrix(matrixA + identityMatrix2)
 printMatrix((matrixA + matrixB).matrix)
