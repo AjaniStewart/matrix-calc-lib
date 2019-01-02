@@ -11,7 +11,7 @@ class Matrix(object):
             return errorMatrix(self.matrix)
         elif (self.cols!=other.cols):
             print("Undefined Sum: number of columns differ")
-            return errorMatrix(matriself.matrix)
+            return errorMatrix(self.matrix)
         else:
             sumMatrix = []
             for row in range(self.rows):
