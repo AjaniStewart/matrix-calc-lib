@@ -4,14 +4,15 @@ class Matrix(object):
         self.rows = len(self.matrix)
         self.cols = len(self.matrix[0])
     def __add__(self, other):
-        if (not(hasattr(other.matrix, "__iter__"))):
-            print("Error: One addend is not a matrix")
+        if (not(isinstance(other, Matrix))):
+            print("Undefined sum: One addend is not a matrix")
+            return Matrix(errorMatrix(self.matrix))
         elif (self.rows!=other.rows):
             print("Undefined Sum: number of rows differ")
-            return errorMatrix(self.matrix)
+            return Matrix(errorMatrix(self.matrix))
         elif (self.cols!=other.cols):
             print("Undefined Sum: number of columns differ")
-            return errorMatrix(self.matrix)
+            return Matrix(errorMatrix(self.matrix))
         else:
             sumMatrix = []
             for row in range(self.rows):
@@ -84,7 +85,11 @@ identityMatrix2 = Matrix(matrix)
 matrixA = Matrix(stringToList("1,0,0;0,1,0;0,0,1"))
 matrixB = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-printMatrix(matrixA + identityMatrix2)
+matrixZ = Matrix(stringToList("1,0;0,1;0,1"))
+
+printMatrix((matrixA + 5).matrix) # scalar error
+printMatrix((matrixA + matrixZ).matrix) # cols wrong error
+printMatrix((matrixA + identityMatrix2).matrix) # rows wrong error
 printMatrix((matrixA + matrixB).matrix)
 
 matrixC = 5 * matrixA
