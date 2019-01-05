@@ -1,18 +1,19 @@
+class MatrixError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+
 class Matrix(object):
     def __init__(self, matrixList):
         self.matrix = matrixList
         self.rows = len(self.matrix)
         self.cols = len(self.matrix[0])
+
     def __add__(self, other):
         if (not(isinstance(other, Matrix))):
-            print("Undefined sum: One addend is not a matrix")
-            return Matrix(errorMatrix(self.matrix))
-        elif (self.rows!=other.rows):
-            print("Undefined Sum: number of rows differ")
-            return Matrix(errorMatrix(self.matrix))
-        elif (self.cols!=other.cols):
-            print("Undefined Sum: number of columns differ")
-            return Matrix(errorMatrix(self.matrix))
+            raise MatrixError("One addend is not a matrix")
+        elif (self.rows!=other.rows or self.cols != other.cols):
+            raise MatrixError("Dimension Mismatch")
         else:
             sumMatrix = []
             for row in range(self.rows):
@@ -21,6 +22,7 @@ class Matrix(object):
                     rowsum.append(self.matrix[row][col]+other.matrix[row][col])
                 sumMatrix.append(rowsum)
             return Matrix(sumMatrix)
+
     def __rmul__(self, other):
         if (not(hasattr(other, "__iter__"))): # scalar product
             productMatrix = []; scalar = other
@@ -30,8 +32,32 @@ class Matrix(object):
                     colproducts.append(scalar * self.matrix[row][col])
                 productMatrix.append(colproducts)
             return Matrix(productMatrix)
+
     def __mul__(self, other):
-        return other * self
+        if isinstance(other,Matrix):
+            if self.cols != other.rows:
+                raise MatrixError("Dimension mismatch")
+            else: # matrix mulitplication
+                #create 'empty' 2d matrix
+                result = Matrix([[None for _ in range(other.cols)] for _ in range(self.rows)])
+                # iterate over the cols of self and rows of other
+                for current_row in range(self.rows):
+                    for current_col in range(other.cols):
+                        sum = 0
+                        for i in range(self.cols):
+                            sum += self.matrix[current_row][i] * other.matrix[i][current_col]
+                        result.matrix[current_row][current_col] = sum
+            return result
+        else:
+            return other * self #scalar product
+    
+    def transpose(self):
+        result = [[None for _ in range(self.rows)] for _ in range(self.cols)]
+        for i in range(self.rows):
+            for j in range(self.cols):
+                result[j][i] = self.matrix[i][j]
+        return Matrix(result)
+        
     def toString(self):
         outString = ""
         for row in range(self.rows):
@@ -40,6 +66,8 @@ class Matrix(object):
                 outString += str(self.matrix[row][col]) + " "
             outString = outString[:-1]+"|\n"
         return (outString)
+        
+
     def read(self):
         print(self.toString())
 
@@ -57,6 +85,7 @@ def stringToList(inString):
         matrix.append(colsList)
     return matrix
 
+# what is the point of having this here if read() does the same thing
 def printMatrix(matrix):
     outString = ""
     for row in range(len(matrix)):
@@ -66,36 +95,42 @@ def printMatrix(matrix):
         outString = outString[:-1]+"|\n"
     print(outString)
 
-def errorMatrix(matrix1):
-        undefOutList = []
-        row, col = 0,0
-        for row in range(len(matrix1)):
-            rowlist = []
-            for col in range(len(matrix1[0])):
-                rowlist.append("*")
-            undefOutList.append(rowlist)
-        return undefOutList
-# -- Rudementary Tests -- #
+#removed error matrix
 
-# Input matrix with commas separating elements and semicolons terminating lines
-inString = "1,0;0,1"
-matrix = stringToList(inString)
-identityMatrix2 = Matrix(matrix)
+if __name__ == "__main__":
+    # -- Rudementary Tests -- #
 
-matrixA = Matrix(stringToList("1,0,0;0,1,0;0,0,1"))
-matrixB = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    # Input matrix with commas separating elements and semicolons terminating lines
+    # inString = "1,0;0,1"
+    # matrix = stringToList(inString)
+    # identityMatrix2 = Matrix(matrix)
 
-matrixZ = Matrix(stringToList("1,0;0,1;0,1"))
+    # matrixA = Matrix(stringToList("1,0,0;0,1,0;0,0,1"))
+    # matrixB = Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-printMatrix((matrixA + 5).matrix) # scalar error
-printMatrix((matrixA + matrixZ).matrix) # cols wrong error
-printMatrix((matrixA + identityMatrix2).matrix) # rows wrong error
-printMatrix((matrixA + matrixB).matrix)
+    # matrixZ = Matrix(stringToList("1,0;0,1;0,1"))
 
-matrixC = 5 * matrixA
-printMatrix(matrixC.matrix)
-matrixD =  matrixC * 5
-printMatrix(matrixD.matrix)
+    # printMatrix((matrixA + 5).matrix) # scalar error
+    # printMatrix((matrixA + matrixZ).matrix) # cols wrong error
+    # printMatrix((matrixA + identityMatrix2).matrix) # rows wrong error
+    # printMatrix((matrixA + matrixB).matrix)
 
-print(matrixD.toString())
-matrixD.read()
+    # matrixC = 5 * matrixA
+    # printMatrix(matrixC.matrix)
+    # matrixD =  matrixC * 5
+    # printMatrix(matrixD.matrix)
+
+    # print(matrixD.toString())
+    # matrixD.read()
+
+    matrixA = Matrix([[5,3],[2,9],[-3,7],[18,4]])
+    matrixB = Matrix([[9],[-3]])
+    matrixC = matrixA * matrixB
+    matrixD = matrixC * 5
+    matrixE = Matrix([[2],[3]])
+    #(matrixB + matrixE).read()
+    # matrixA.read()
+    # matrixB.read()
+    matrixA.read()
+    matrixA.transpose().read()
+    #matrixD.read()
