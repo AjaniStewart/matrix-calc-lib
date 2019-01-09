@@ -15,47 +15,31 @@ class Matrix(object):
         elif (self.rows!=other.rows or self.cols != other.cols):
             raise MatrixError("Dimension Mismatch")
         else:
-            sumMatrix = []
-            for row in range(self.rows):
-                rowsum = []
-                for col in range(self.cols):
-                    rowsum.append(self.matrix[row][col]+other.matrix[row][col])
-                sumMatrix.append(rowsum)
+            sumMatrix = [[self.matrix[row][col]+other.matrix[row][col] 
+                        for col in range(self.cols)] 
+                        for row in range(self.rows)]
             return Matrix(sumMatrix)
 
     def __rmul__(self, other):
         if (not(hasattr(other, "__iter__"))): # scalar product
-            productMatrix = []; scalar = other
-            for row in range(self.rows):
-                colproducts = []
-                for col in range(self.cols):
-                    colproducts.append(scalar * self.matrix[row][col])
-                productMatrix.append(colproducts)
+            productMatrix = [[other*x for x in self.matrix[i]] for i in range(self.rows)]
             return Matrix(productMatrix)
 
     def __mul__(self, other):
-        if isinstance(other,Matrix):
+        if isinstance(other,Matrix): # matrix mulitplication
             if self.cols != other.rows:
                 raise MatrixError("Dimension mismatch")
-            else: # matrix mulitplication
-                #create 'empty' 2d matrix
-                result = Matrix([[None for _ in range(other.cols)] for _ in range(self.rows)])
+            else:
                 # iterate over the cols of self and rows of other
-                for current_row in range(self.rows):
-                    for current_col in range(other.cols):
-                        sum = 0
-                        for i in range(self.cols):
-                            sum += self.matrix[current_row][i] * other.matrix[i][current_col]
-                        result.matrix[current_row][current_col] = sum
-            return result
+                result = [
+                    [sum([self.matrix[row][i]*other.matrix[i][col] for i in range(self.cols)])
+                    for col in range(other.cols)] for row in range(self.rows)]
+                return Matrix(result)
         else:
             return other * self #scalar product
     
     def transpose(self):
-        result = [[None for _ in range(self.rows)] for _ in range(self.cols)]
-        for i in range(self.rows):
-            for j in range(self.cols):
-                result[j][i] = self.matrix[i][j]
+        result = [[self.matrix[i][j] for i in range(self.rows)] for j in range(self.cols)]
         return Matrix(result)
         
     def toString(self):
@@ -75,27 +59,9 @@ def stringToList(inString):
     if (inString[-1]==";"):
         # strip trailing semicolon if present
         inString = inString[:-1]
-    rows = inString.split(";")
-    matrix = []
-    for row in rows:
-        cols = row.split(',')
-        colsList = []
-        for col in cols:
-            colsList.append(int(col))
-        matrix.append(colsList)
+    matrix = [[int(col) for col in row.split(',')] for row in inString.split(";")]
     return matrix
 
-# what is the point of having this here if read() does the same thing
-def printMatrix(matrix):
-    outString = ""
-    for row in range(len(matrix)):
-        outString += "|"
-        for col in range(len(matrix[0])):
-            outString += str(matrix[row][col]) + " "
-        outString = outString[:-1]+"|\n"
-    print(outString)
-
-#removed error matrix
 
 if __name__ == "__main__":
     # -- Rudementary Tests -- #
@@ -127,10 +93,16 @@ if __name__ == "__main__":
     matrixB = Matrix([[9],[-3]])
     matrixC = matrixA * matrixB
     matrixD = matrixC * 5
-    matrixE = Matrix([[2],[3]])
+    # matrixE = Matrix([[2],[3]])
     #(matrixB + matrixE).read()
     # matrixA.read()
     # matrixB.read()
-    matrixA.read()
-    matrixA.transpose().read()
+    # matrixA.read()
+    # matrixA.transpose().read()
+    matrixC.read()
+    matrixD.read()
+    (matrixC + matrixD).read()
+    matrixD.transpose().read()
+    matrixE = Matrix(stringToList("1,0,0;0,1,0;0,0,1"))
+    matrixE.read()
     #matrixD.read()
